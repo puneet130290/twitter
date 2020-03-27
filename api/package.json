@@ -1,0 +1,24 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "This is a simple twitter clone.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src"
+  },
+  "author": "Puneet Saini",
+  "license": "ISC",
+  "dependencies": {
+    "apollo-server": "^2.11.0",
+    "apollo-server-express": "^2.11.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-session": "^1.17.0",
+    "graphql-passport": "^0.6.3",
+    "graphql-type-json": "^0.3.1",
+    "mongoose": "^5.9.5",
+    "passport": "^0.4.1",
+    "uuid": "^7.0.2"
+  }
+}
