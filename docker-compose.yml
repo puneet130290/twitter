@@ -6,13 +6,26 @@ services:
       - '3000:3000'
     depends_on:
       - api
+    environment:
+      - REACT_APP_BACKEND_SERVER=http://localhost:4000
   api:
     build: ./api
     ports:
       - '4000:4000'
     depends_on:
       - mongo
+      - redis
+    environment:
+      - REDIS_URL=redis://session
+      - NODE_ENV=development
+      - SALT_ROUNDS=10
+      - MONGODB_URI=mongodb://mongo:27017/twitter
   mongo:
     image: mongo
     ports:
       - '27017:27017'
+  redis:
+    image: redis
+    container_name: session
+    ports:
+      - '6379:6379'

@@ -1,5 +1,4 @@
-FROM node:10
-ENV MONGODB_URI='mongodb://mongo:27017/twitter'
+FROM node:lts
 # Create app directory
 WORKDIR /usr/src/twitter/api
 # Install app dependencies

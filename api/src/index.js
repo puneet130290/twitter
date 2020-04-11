@@ -14,15 +14,15 @@ const { GraphQLLocalStrategy, buildContext } = require('graphql-passport')
 
 const { typeDefs, dataSources, resolvers } = require('./entities')
 
-const RedisStore = require('connect-redis')(session)
-const redisClient = redis.createClient()
-
 if (process.env.NODE_ENV !== 'production') {
   var dotenv = require('dotenv')
   dotenv.config()
 }
 
-const { PORT, MONGODB_URI } = process.env
+const { PORT, MONGODB_URI, REDIS_URL } = process.env
+const RedisStore = require('connect-redis')(session)
+const redisClient = redis.createClient(REDIS_URL)
+
 const SESSION_SECRECT = 'bad secret'
 
 const mongoose = require('mongoose')
