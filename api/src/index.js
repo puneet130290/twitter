@@ -6,11 +6,16 @@ const {
 const express = require('express')
 const cors = require('cors')
 const session = require('express-session')
+const bcrypt = require('bcrypt')
+const redis = require('redis')
 const uuid = require('uuid/v4')
 const passport = require('passport')
 const { GraphQLLocalStrategy, buildContext } = require('graphql-passport')
 
 const { typeDefs, dataSources, resolvers } = require('./entities')
+
+const RedisStore = require('connect-redis')(session)
+const redisClient = redis.createClient()
 
 if (process.env.NODE_ENV !== 'production') {
   var dotenv = require('dotenv')
@@ -57,12 +62,16 @@ const connectToDatabase = () => {
 
 passport.use(
   new GraphQLLocalStrategy(async (email, password, done) => {
-    const users = await dataSources.usersDB.find()
-    const matchingUser = users.find(
-      user => email === user.email && password === user.password
-    )
-    const error = matchingUser ? null : new Error('no matching user')
-    done(error, matchingUser)
+    let error = null
+    const [user] = await dataSources.usersDB.find({ email })
+    if (!user) {
+      error = new Error('no matching user')
+    }
+    const isPasswordCorrect = await bcrypt.compare(password, user.password)
+    if (!isPasswordCorrect) {
+      error = new Error('incorrect password')
+    }
+    done(error, user)
   })
 )
 
@@ -70,7 +79,7 @@ const app = express()
 
 app.use(
   session({
-    genid: req => uuid(),
+    store: new RedisStore({ client: redisClient }),
     secret: SESSION_SECRECT,
     resave: false,
     saveUninitialized: false,
@@ -95,6 +104,11 @@ const server = new ApolloServer({
   },
 })
 
+const corsOptions = {
+  origin: 'http://localhost:3000',
+  credentials: true,
+}
+
 app.use((req, res, next) => {
   connectToDatabase()
     .then(() => next())
@@ -102,7 +116,7 @@ app.use((req, res, next) => {
       throw error
     })
 })
-app.use(cors())
+app.use(cors(corsOptions))
 
 server.applyMiddleware({ app, cors: false })
 

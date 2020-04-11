@@ -15,27 +15,15 @@ const resolvers = {
       _,
       { email, password },
       { dataSources, authenticate, login }
-    ) => {
-      const { user } = await authenticate('graphql-local', {
-        email,
-        password,
-      })
-      await login(user)
-      return user
-    },
+    ) =>
+      await dataSources.usersDB.login(
+        { email, password },
+        authenticate,
+        login
+      ),
+    signup: async (_, { user }, { dataSources }) =>
+      await dataSources.usersDB.signup(user),
     logout: async (_, __, { logout }) => logout(),
-    signup: async (_, { user }, { dataSources, login }) => {
-      const existingUsers = await dataSources.usersDB.find()
-      const userWithEmailAlreadyExists = !!existingUsers.find(
-        u => u.email === user.email
-      )
-      if (userWithEmailAlreadyExists) {
-        throw new Error('User with email already exists')
-      }
-      const newUser = await dataSources.usersDB.save(user)
-      await login(newUser)
-      return newUser
-    },
     createUser: async (_, { user }, { dataSources }) =>
       await dataSources.usersDB.save(user),
   },
