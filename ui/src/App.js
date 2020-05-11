@@ -5,7 +5,7 @@ import './views/styles.css'
 import { TwitterContent } from './theme'
 import { withRouter } from 'react-router-dom'
 
-import routes, { publicRoutes, testRoutes } from './routes'
+import routes, { publicRoutes } from './routes'
 import { useGetCurrentUser } from './hooks/dataSource'
 
 import { Layout, Menu, Breadcrumb } from 'antd'
